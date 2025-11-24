@@ -8,15 +8,15 @@ import (
 )
 
 var (
-	FileName = "app_log.txt"
-	File     *os.File
+	fileName = "app_log.txt"
+	file     *os.File
 )
 
 func InitLogger() error {
 
 	var err error
 
-	File, err = os.OpenFile(FileName, os.O_WRONLY|os.O_APPEND, 0666)
+	file, err = os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		return err
 	}
@@ -25,19 +25,28 @@ func InitLogger() error {
 
 func LogMetric(message string) {
 
-	if File != nil {
+	if file != nil {
 		//В файл добавляем временную метку
 		timeTamp := time.Now().Format("2006-01-02 15:04:05")
 		fileMessage := fmt.Sprintf("[%s] %s\n", timeTamp, message)
 
-		File.WriteString(fileMessage)
+		file.WriteString(fileMessage) //запись строки в файл
 	}
 	//обновляемая строка в консоли
 	fmt.Printf("\r%s", message)
 }
 
+// закрываем файл
 func Close() {
-	if File != nil {
-		File.Close()
+	if file != nil {
+		file.Close()
 	}
+}
+
+// Статичные сообщения в консоль и файл
+func SystemMessage(message string) {
+	if file != nil {
+		file.WriteString(message + "\n")
+	}
+	fmt.Println(message)
 }
