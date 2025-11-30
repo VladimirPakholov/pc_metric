@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"pc_metric/internal/logger"
-	"pc_metric/metrics/cpu"
-	net "pc_metric/metrics/net_int"
-	"pc_metric/metrics/ram"
+	"pc_metric/internal/metrics/cpu"
+	net "pc_metric/internal/metrics/net_int"
+	"pc_metric/internal/metrics/ram"
 )
 
 func main() {
@@ -43,5 +43,6 @@ func main() {
 	}
 
 	logger.SystemMessage("\n=== END ===")
+	fmt.Println("Time completed: ", time.Since(startApp))
 
 }
