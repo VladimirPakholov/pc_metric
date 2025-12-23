@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"pc_metric/internal/database"
 	"pc_metric/internal/logger"
 	"pc_metric/internal/metrics/cpu"
 	net "pc_metric/internal/metrics/net_int"
@@ -19,6 +20,20 @@ func main() {
 		fmt.Println("File .env not found")
 		os.Exit(1)
 	}
+	cfg := database.Config{
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		User:     os.Getenv("DB_USER"),
+		Password: os.Getenv("DB_PASSWORD"),
+		DBname:   os.Getenv("DB_NAME"),
+		SSLmode:  os.Getenv("DB_SSLMODE"),
+	}
+
+	db, err := database.NewDB(cfg)
+	if err != nil {
+		os.Exit(1)
+	}
+	defer db.Close()
 	//читаем строку из файла с переменными
 	defaultTimeWorkStr := os.Getenv("DEFAULT_TIME_WORK")
 
