@@ -1,3 +1,5 @@
 quick_go_struct_project.sh
 app_log.txt
-.DS_Store._.DS_Store
+.DS_Store
+.env
+
