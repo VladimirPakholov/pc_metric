@@ -34,6 +34,11 @@ func main() {
 		os.Exit(1)
 	}
 	defer db.Close()
+	err = database.NewTable(db)
+	if err != nil {
+		os.Exit(1)
+	}
+
 	//читаем строку из файла с переменными
 	defaultTimeWorkStr := os.Getenv("DEFAULT_TIME_WORK")
 
@@ -42,7 +47,6 @@ func main() {
 		fmt.Printf("Parse error time from .env: %v. Set default time 1m\n", err)
 		defaultTimeWorkT = 1 * time.Minute
 	}
-
 	defaultTimeMetricStr := os.Getenv("DEFAULT_TIME_GET_METRIC")
 
 	defaultTimeMetricT, err := time.ParseDuration(defaultTimeMetricStr)
@@ -72,12 +76,6 @@ func main() {
 	timer := time.NewTimer(*timeWorkDefault) // общее время работы программы
 	defer timer.Stop()
 
-	err = logger.InitLogger()
-	if err != nil {
-		panic(err)
-	}
-	defer logger.Close()
-
 	logger.SystemMessage("=== Start getting CPU & RAM metric ===")
 	logger.SystemMessage("=== Initialization... The network interface speed will be available in 10 seconds ===")
 
@@ -94,7 +92,11 @@ func main() {
 			la := cpu.GetLoadAverage()
 			r := ram.GetMemInfo()
 
-			message := fmt.Sprintf("Load average is: 1 min: %.2f, 5 min: %.2f, 15 min: %.2f | RAM: %v/%vGB (%vGB free) | NET: %s ", la.Load1, la.Load5, la.Load15, r[0], r[1], r[2], netMsg)
+			message := fmt.Sprintf(logger.LogMessage, la.Load1, la.Load5, la.Load15, r[0], r[1], r[2], netMsg)
+			err = database.InsertLogMetric(db, logger.TimeStamp(), message)
+			if err != nil {
+				logger.SystemMessage("DB insert error: " + err.Error())
+			}
 
 			logger.LogMetric(message)
 
