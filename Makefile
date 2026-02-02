@@ -10,6 +10,7 @@ run:
 		echo "DB_PORT=5432" >> .env; \
 		echo "DB_SSLMODE=disable" >> .env; \
 		echo "DB_HOST=localhost" >> .env; \
+		echo "WORK_DIR_PATH=$$(pwd)" >> .env; \
 	fi
 	@set -a; \
 	. ./$(ENV_FILE); \

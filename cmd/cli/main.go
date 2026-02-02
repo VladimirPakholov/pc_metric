@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"os"
 	"pc_metric/internal/app"
+	"pc_metric/internal/db"
+	"pc_metric/internal/db/migrations"
 	"pc_metric/internal/service"
-	"pc_metric/repository"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -23,25 +24,25 @@ func main() {
 		os.Exit(1)
 	}
 
-	db, err := repository.DBconnection()
+	db, err := db.InitDB()
 	if err != nil {
 		os.Exit(1)
 	}
 	defer db.DB.Close()
 
-	if err := db.RunMigration(); err != nil {
+	if err := migrations.RunMigration(); err != nil {
 		fmt.Println("Migration error:", err)
 		os.Exit(1)
 	}
-	t := service.NewTimeStruct()
+	t := service.NewTimeCfg()
 
-	cfg := service.ParseFlags(t.DefaultTimeWork, t.DefaultTimeMetric)
+	cfg := service.ParseFlags(t.DefaultTimeWork, t.DefaultTimeGetMetric)
 	if cfg.CustomWorkTime > 0 {
 		workTime = cfg.CustomWorkTime
 		metricInterval = cfg.CustomMetricInterval
 	} else {
 		workTime = t.DefaultTimeWork
-		metricInterval = t.DefaultTimeMetric
+		metricInterval = t.DefaultTimeGetMetric
 	}
 
 	app.Start(workTime, metricInterval, db)
