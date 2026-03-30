@@ -3,12 +3,11 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"pc_metric/internal/db/repository"
 
 	_ "github.com/lib/pq"
 )
 
-func InitDB() (*repository.Repository, error) {
+func InitDB() (*sql.DB, error) {
 
 	urlDB := BuildPostgreDSN()
 
@@ -21,8 +20,5 @@ func InitDB() (*repository.Repository, error) {
 	if errPing != nil {
 		return nil, fmt.Errorf("data base ping error: %w", errPing)
 	}
-	fmt.Println("Connected to data base - successfull!")
-
-	return &repository.Repository{DB: db}, nil
-
+	return db, nil
 }

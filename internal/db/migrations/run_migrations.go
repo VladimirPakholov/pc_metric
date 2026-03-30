@@ -44,3 +44,36 @@ func RunMigration() error {
 	}
 	return nil
 }
+
+// down sql migration
+func RollbackMigration() error {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("Error get current dir: %v", err)
+	}
+
+	pathWorkDir := os.Getenv("WORK_DIR_PATH")
+
+	if pathWorkDir == "" {
+		pathWorkDir = cwd
+	}
+
+	pathToMigration := filepath.Join(pathWorkDir, "migrations/pg")
+
+	absMigrationPath, err := filepath.Abs(pathToMigration)
+
+	if err != nil {
+		return fmt.Errorf("Failed to get absolute path for %s: %w", absMigrationPath, err)
+	}
+
+	migration, err := migrate.New("file://"+filepath.ToSlash(absMigrationPath), db.BuildPostgreDSN())
+	if err != nil {
+		return err
+	}
+	defer migration.Close()
+	errM := migration.Down()
+	if errM != nil && errM != migrate.ErrNoChange {
+		return errM
+	}
+	return nil
+}
