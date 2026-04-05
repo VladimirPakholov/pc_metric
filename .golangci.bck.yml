@@ -1,0 +1,26 @@
+run:
+  timeout: 2m
+  issues-exit-code: 0
+
+
+linters:
+  enable:
+    - govet
+    - errcheck
+    - staticcheck
+    - unused
+    - ineffassign
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+
+  govet:
+    enable:
+      - shadow
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
